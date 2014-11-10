@@ -1,0 +1,19 @@
+<launch>
+
+  <group ns="randomizer">
+    <node pkg="beginner_tutorials" name="randomizer" type="randomizer"/>
+  </group>
+
+  <group ns="mult_by_two">
+    <node pkg="beginner_tutorials" name="mult_by_two" type="mult_by_two"/>
+  </group>
+
+  <group ns="add_two_ints_server">
+    <node pkg="beginner_tutorials" name="add_two_ints_server" type="add_two_ints_server"/>
+  </group>
+
+    <group ns="add_two_ints_client">
+    <node pkg="beginner_tutorials" name="add_two_ints_client" type="add_two_ints_client"/>
+  </group>
+
+</launch>
