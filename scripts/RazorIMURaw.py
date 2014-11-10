@@ -6,7 +6,7 @@ import math
 import string
 import serial
 
-s = serial.Serial('/dev/ttyUSB0', 57600)
+s = serial.Serial('/dev/razorimu', 57600)
 #s.write('1 s.p\r\n')
 
 g0 = 9.80665
@@ -15,10 +15,10 @@ grad2rad = 3.141592/180.0
 tmpdata = ''
 while True:
   line = s.readline()
-  line = line.replace("$","")   # Delete "!ANG:"
-  line = line.replace("#","")   # Delete "!ANG:"
-  line = line.replace("\r","")   # Delete "!ANG:"
-  line = line.replace("\n","")   # Delete "!ANG:"
+  line = line.replace("$","")
+  line = line.replace("#","")
+  line = line.replace("\r","")
+  line = line.replace("\n","")
   words = string.split(line,",")
   #print len(words)
   #tmpdata = tmpdata.strip('$')
@@ -34,7 +34,7 @@ while True:
         magx = (float(words[6])*.00256)/10000
         magy = float(words[7])/230
         magz = float(words[8])/230
-        print magx
+        #print magx
 
     except:
         print "Invalid line"
