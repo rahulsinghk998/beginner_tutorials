@@ -9,6 +9,9 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   message_generation
   rospy
+  geometry_msgs
+  sensor_msgs
+  roslib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -18,7 +21,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
- catkin_python_setup()
+# catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -68,6 +71,8 @@ find_package(catkin REQUIRED COMPONENTS
  generate_messages(
    DEPENDENCIES
    std_msgs
+   geometry_msgs
+   sensor_msgs
  )
 
 ###################################
@@ -80,10 +85,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#    DEPENDS  message_runtime
-#    CATKIN_DEPENDS message_generation message_runtime std_msgs Num
-#    INCLUDE_DIRS # TODO include
-#    LIBRARIES # TODO
+    DEPENDS  #message_runtime
+    CATKIN_DEPENDS #message_generation message_runtime std_msgs Num
+    INCLUDE_DIRS # TODO include
+    LIBRARIES # TODO
 )
 
 ###########
@@ -185,4 +190,4 @@ add_dependencies(add_two_ints_client beginner_tutorials_gencpp)
 add_dependencies(mult_by_two beginner_tutorials_gencpp)
 add_dependencies(randomizer beginner_tutorials_generate_messages_cpp)
 
-#install(PROGRAMS scripts/razor_imu DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+install(PROGRAMS scripts/razor_imu DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

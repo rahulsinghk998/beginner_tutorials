@@ -1,9 +1,10 @@
-__author__ = 'andy'
-
 #!/usr/bin/python
+#__author__ = 'andy'
 
-import roslib
-roslib.load_manifest('razor_imu')
+
+
+#import roslib
+#roslib.load_manifest('razor_imu')
 import rospy
 from std_msgs.msg import Header, String
 from geometry_msgs.msg import Quaternion, Vector3
@@ -14,6 +15,7 @@ import math
 
 import numpy
 import serial
+import string
 
 g0 = 9.80665				# Gravity constant
 
@@ -28,9 +30,9 @@ port = rospy.get_param('~port', '/dev/razorimu')		# This is the serial port for 
 s = serial.Serial(port, 57600)
 
 # Setup publishers (Purpose of each explained above)
-pub = rospy.Publisher('/imu/data_raw', Imu)
-mag_pub = rospy.Publisher('/imu/mag_raw', MagneticField)
-raw_pub = rospy.Publisher('/imu/raw', String)
+pub = rospy.Publisher('/imu/data_raw', Imu, queue_size=10)
+mag_pub = rospy.Publisher('/imu/mag_raw', MagneticField, queue_size=10)
+raw_pub = rospy.Publisher('/imu/raw', String, queue_size=10)
 
 # Function to handle the output of the imu device
 # Input: Data - comma seperated string from imu
@@ -43,29 +45,28 @@ def handle_line(data, now):
         # P:,257925,mp,168.249969,23.194071,479.150848,ap,40.882568,-248.846878,970.272583,gp,0.000050,0.000001,0.000019,T,27.56
         # Publish the raw data for debug purposes
         raw_pub.publish(data)
+        acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z, mag_x, mag_y, mag_z = data.split(',')
+        rospy.loginfo(data)
+        acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z, mag_x, mag_y, mag_z = map(float, [acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z, mag_x, mag_y, mag_z])
 
-        # Parse out the data
-        const_P_colon, timestamp, const_mp, mag_x, mag_y, mag_z, const_ap, acc_x, acc_y, acc_z, const_gp, gyro_x, gyro_y, gyro_z = data.split(',')
-
-	# Check to make sure we parsed correctly
-        assert const_P_colon == 'P:'
-        assert const_mp == 'mp'
-        assert const_ap == 'ap'
-        assert const_gp == 'gp'
-
-	# Convert to floating points
-        timestamp, mag_x, mag_y, mag_z, acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z = map(float, [timestamp, mag_x, mag_y, mag_z, acc_x, acc_y, acc_z, gyro_x, gyro_y, gyro_z])
 
     # Catch all exceptions
     except Exception:
         print repr(data)
+        #rospy.loginfo("Error!!!!!!!!")
         traceback.print_exc()
         return
 
-    # Scale the data
-    mag_x, mag_y, mag_z = [1e-7 * x for x in [mag_x, mag_y, mag_z]]
-    acc_x, acc_y, acc_z = [-1e-3 * g0 * x for x in [acc_x, acc_y, acc_z]]
-    gyro_x, gyro_y, gyro_z = [110.447762 * x for x in [gyro_x, gyro_y, gyro_z]]
+
+    acc_x = float(acc_x)*0.03646840148
+    acc_y = float(acc_y)*0.03646840148
+    acc_z = float(acc_z)*0.03646840148
+    gyro_x = (float(gyro_x)/14.375)*0.0174532925
+    gyro_y = (float(gyro_y)/14.375)*0.0174532925
+    gyro_z = (float(gyro_z)/14.375)*0.0174532925
+    mag_x = (float(mag_x)*.00256)/10000
+    mag_y = float(mag_y)/230
+    mag_z = float(mag_z)/230
 
     # Publish the IMU data
     pub.publish(Imu(
@@ -90,20 +91,15 @@ def handle_line(data, now):
         magnetic_field=Vector3(mag_x, mag_y, mag_z),
     ))
 
-
-
-tmpdata = ''
 while not rospy.is_shutdown():
-    # Get the size of the input buffer
-    waiting = s.inWaiting()
-    # Get current time
-    now = rospy.Time.now()
-    # Read all data on input buffer
-    tmpdata += s.read(waiting) 		# blocking seems to break things, strangely
-    # Break up based on new lines
-    x = tmpdata.split('\n')
-    # Access The last element in X so throw away any data that came prior
-    tmpdata = x[-1]
-    #Handel data
-    for data in x[:-1]:
-        handle_line(data, now)
+
+  now = rospy.Time.now()
+
+  line = s.readline()
+  line = line.replace("$","")
+  line = line.replace("#","")
+  line = line.replace("\r","")
+  words = line.replace("\n","")
+  #words = string.split(words,",")
+
+  handle_line(words, now)
