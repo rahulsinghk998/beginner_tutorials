@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   sensor_msgs
   roslib
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -173,6 +174,8 @@ add_executable(add_two_ints_server src/add_two_ints_server.cpp)
 add_executable(add_two_ints_client src/add_two_ints_client.cpp)
 add_executable(mult_by_two src/mult_by_two.cpp)
 add_executable(randomizer src/randomizer.cpp)
+add_executable(tf_broadcaster src/tf_broadcaster.cpp)
+add_executable(tf_listener src/tf_listener.cpp)
 
 
 target_link_libraries(talker ${catkin_LIBRARIES})
@@ -181,6 +184,8 @@ target_link_libraries(add_two_ints_server ${catkin_LIBRARIES})
 target_link_libraries(add_two_ints_client ${catkin_LIBRARIES})
 target_link_libraries(mult_by_two ${catkin_LIBRARIES})
 target_link_libraries(randomizer ${catkin_LIBRARIES})
+target_link_libraries(tf_broadcaster ${catkin_LIBRARIES})
+target_link_libraries(tf_listener ${catkin_LIBRARIES})
 
 
 add_dependencies(talker beginner_tutorials_generate_messages_cpp)
@@ -191,3 +196,6 @@ add_dependencies(mult_by_two beginner_tutorials_gencpp)
 add_dependencies(randomizer beginner_tutorials_generate_messages_cpp)
 
 install(PROGRAMS scripts/razor_imu DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+
+
